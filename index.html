@@ -9,58 +9,67 @@
   <meta name="apple-mobile-web-app-title" content="خزينة">
   <meta name="application-name" content="خزينة">
   <meta name="theme-color" content="#0D47A1">
-
   <title>خزينة السائق</title>
 
-  <!-- ✅ manifest حقيقي كملف خارجي -->
+  <!-- manifest وأيقونات حقيقية على نفس النطاق -->
   <link rel="manifest" href="./manifest.json">
-
-  <!-- ✅ أيقونات حقيقية كملفات خارجية -->
   <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
-  <link rel="icon" type="image/png" sizes="256x256" href="./icon-256.png">
-  <link rel="icon" type="image/png" sizes="128x128" href="./icon-128.png">
   <link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
   <link rel="apple-touch-icon" sizes="256x256" href="./icon-256.png">
   <link rel="apple-touch-icon" sizes="128x128" href="./icon-128.png">
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #0D47A1;
+    }
+
+    /* شاشة splash تظهر أثناء تحميل الـ iframe */
+    #splash {
+      position: fixed;
+      inset: 0;
       background: linear-gradient(135deg, #0D47A1 0%, #1E88E5 100%);
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-family: Arial, sans-serif;
-      direction: rtl;
-    }
-    .splash {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       gap: 18px;
-      animation: fadeIn .5s ease;
+      z-index: 10;
+      transition: opacity .5s ease;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
+    #splash.hide {
+      opacity: 0;
+      pointer-events: none;
     }
+
     .icon-wrap {
-      width: 100px; height: 100px;
+      width: 96px; height: 96px;
       border-radius: 22px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 32px rgba(0,0,0,.35);
       animation: pulse 1.8s ease-in-out infinite;
     }
     @keyframes pulse {
-      0%,100% { transform: scale(1);    box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-      50%      { transform: scale(1.05); box-shadow: 0 14px 40px rgba(0,0,0,0.4); }
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.06); }
     }
     .icon-wrap img { width: 100%; height: 100%; object-fit: cover; }
-    .app-name { font-size: 1.5rem; font-weight: 700; color: white; }
-    .app-sub  { font-size: .875rem; color: rgba(255,255,255,.72); margin-top: -10px; }
-    .loader   { display: flex; gap: 8px; margin-top: 4px; }
+
+    .app-name {
+      font-size: 1.5rem; font-weight: 700;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .app-sub {
+      font-size: .875rem;
+      color: rgba(255,255,255,.72);
+      font-family: Arial, sans-serif;
+      margin-top: -10px;
+    }
+    .loader { display: flex; gap: 8px; }
     .loader span {
       width: 9px; height: 9px; border-radius: 50%;
       background: rgba(255,255,255,.65);
@@ -70,28 +79,57 @@
     .loader span:nth-child(3) { animation-delay: .4s; }
     @keyframes bounce {
       0%,80%,100% { transform: scale(.7); opacity: .5; }
-      40%         { transform: scale(1.15); opacity: 1; }
+      40%          { transform: scale(1.2); opacity: 1; }
     }
-    .msg { font-size: .75rem; color: rgba(255,255,255,.45); }
+
+    /* الـ iframe يملأ الشاشة كاملاً */
+    #app-frame {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 1;
+    }
   </style>
 </head>
 <body>
-<div class="splash">
-  <div class="icon-wrap">
-    <img src="./icon-512.png" alt="خزينة">
-  </div>
-  <div class="app-name">متابعة الخزينة</div>
-  <div class="app-sub">السائق الميداني</div>
-  <div class="loader">
-    <span></span><span></span><span></span>
-  </div>
-  <div class="msg">جارٍ التحميل...</div>
-</div>
 
-<script>
-  setTimeout(function () {
-    window.location.replace("https://script.google.com/macros/s/AKfycbyNfUZFiSvlfcq-LebHphX1caW1pp0ZflDc4jDIHUFssbqPmy8_h3Gml2tlja_BPkiH/exec");
-  }, 1400);
-</script>
+  <!-- شاشة التحميل -->
+  <div id="splash">
+    <div class="icon-wrap">
+      <img src="./icon-512.png" alt="خزينة">
+    </div>
+    <div class="app-name">متابعة الخزينة</div>
+    <div class="app-sub">السائق الميداني</div>
+    <div class="loader">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- التطبيق الحقيقي داخل iframe -->
+  <iframe
+    id="app-frame"
+    src="https://script.google.com/macros/s/AKfycbyNfUZFiSvlfcq-LebHphX1caW1pp0ZflDc4jDIHUFssbqPmy8_h3Gml2tlja_BPkiH/exec"
+    allow="fullscreen"
+  ></iframe>
+
+  <script>
+    // إخفاء splash بعد تحميل الـ iframe
+    var frame = document.getElementById('app-frame');
+    var splash = document.getElementById('splash');
+
+    frame.addEventListener('load', function () {
+      setTimeout(function () {
+        splash.classList.add('hide');
+      }, 600);
+    });
+
+    // احتياطي: إخفاء splash بعد 4 ثواني على أقصى تقدير
+    setTimeout(function () {
+      splash.classList.add('hide');
+    }, 4000);
+  </script>
+
 </body>
 </html>
